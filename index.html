@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guia Interativo para Escrever Seu Livro</title>
     <style>
-        /* Estilos CSS para as Abas (Mantidos do Exemplo Anterior) */
-        body { font-family: sans-serif; }
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { color: #333; }
-
+        /* Estilos CSS para as Abas */
         .tab-container {
             width: 90%;
             max-width: 1000px;
             margin: 20px auto;
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Bordas ao redor do conteúdo */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -45,12 +41,12 @@
 
         .tab-button.active {
             background-color: #fff;
-            border-bottom: 2px solid #4CAF50;
+            border-bottom: 2px solid #4CAF50; /* Cor de destaque da aba ativa */
             color: #4CAF50;
         }
 
         .tab-content {
-            display: none;
+            display: none; /* Esconde o conteúdo por padrão */
             padding: 6px 12px;
             border-top: none;
         }
@@ -62,9 +58,6 @@
             border-radius: 5px;
             margin-bottom: 15px;
             border-left: 5px solid #4CAF50;
-        }
-        .checklist-item label {
-            margin-left: 5px;
         }
 
         .personagem-ficha label {
@@ -80,18 +73,15 @@
             border-radius: 4px;
             resize: vertical;
         }
-        .remove-btn {
-            float: right;
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
+
+        /* Aqui você deve colocar os estilos do seu site original, como para H1, H2, etc. */
+        h1 { color: #333; }
+        /* ... outros estilos ... */
     </style>
 </head>
-<body onload="carregarDados()"> <header>
+<body>
+
+    <header>
         <h1>Guia Interativo para Escrever Seu Livro</h1>
         <p>Uma ferramenta para navegar pelas etapas da concepção à publicação, agora com recursos interativos!</p>
     </header>
@@ -106,25 +96,55 @@
 
         <div id="Guias" class="tab-content" style="display: block;">
             <h2>Visão Geral das Fases</h2>
-            <p>Este é o conteúdo principal do seu guia. **(Insira o conteúdo do seu site original aqui)**</p>
-        </div>
+            <p>Este é o conteúdo principal do seu guia, com as seções de Planejamento, 1º Rascunho, Revisão e Finalização.</p>
+            </div>
 
         <div id="ChecklistCapitulos" class="tab-content">
             <h2>📝 Acompanhamento de Capítulos</h2>
-            <p>Use esta seção para acompanhar o progresso de cada capítulo da sua obra. Marque o que já está completo. **O progresso é salvo automaticamente.**</p>
+            <p>Use esta seção para acompanhar o progresso de cada capítulo da sua obra. Marque o que já está completo.</p>
             
             <div id="capitulos-list">
+                <div class="checklist-item">
+                    <input type="checkbox" id="cap1-completo">
+                    <label for="cap1-completo">Capítulo 1: O Despertar (Escrito)</label><br>
+                    <input type="checkbox" id="cap1-revisao">
+                    <label for="cap1-revisao">Capítulo 1: Revisado Estruturalmente</label>
                 </div>
+
+                <div class="checklist-item">
+                    <input type="checkbox" id="cap2-completo">
+                    <label for="cap2-completo">Capítulo 2: A Jornada Começa (Escrito)</label>
+                </div>
+            </div>
             
             <button onclick="adicionarCapitulo()">+ Adicionar Novo Capítulo</button>
         </div>
 
         <div id="FichaPersonagens" class="tab-content">
             <h2>🎭 Fichas de Personagens</h2>
-            <p>Crie e organize as fichas detalhadas para seus personagens principais. **O conteúdo é salvo automaticamente.**</p>
+            <p>Crie e organize as fichas detalhadas para seus personagens principais.</p>
             
             <div id="personagens-list">
+                <div class="personagem-ficha">
+                    <h3>Personagem Principal: Ariane</h3>
+                    
+                    <label for="nome-ariane">Nome Completo:</label>
+                    <input type="text" id="nome-ariane" value="Ariane Silva">
+
+                    <label for="motivacao-ariane">Motivação Principal:</label>
+                    <input type="text" id="motivacao-ariane" value="Buscar a vingança pela família.">
+
+                    <label for="arco-ariane">Arco de Mudança (De/Para):</label>
+                    <textarea id="arco-ariane" rows="3">De fria e implacável para alguém que aprende a confiar nos outros.</textarea>
                 </div>
+                
+                <div class="personagem-ficha">
+                    <h3>Antagonista: Kael</h3>
+                    <label for="nome-kael">Nome Completo:</label>
+                    <input type="text" id="nome-kael" value="Kael, O Observador">
+                    
+                    </div>
+            </div>
 
             <button onclick="adicionarPersonagem()">+ Adicionar Novo Personagem</button>
         </div>
@@ -132,179 +152,69 @@
     </div>
 
     <script>
-        // --- VARIÁVEIS GLOBAIS ---
-        let capitulos = [];
-        let personagens = [];
-
-        // --- FUNÇÕES DE PERSISTÊNCIA (SALVAR/CARREGAR) ---
-
-        function salvarDados() {
-            localStorage.setItem('guiaLivros_capitulos', JSON.stringify(capitulos));
-            localStorage.setItem('guiaLivros_personagens', JSON.stringify(personagens));
-            console.log('Dados Salvos!');
-        }
-
-        function carregarDados() {
-            // Carregar Capítulos
-            const dadosCapitulos = localStorage.getItem('guiaLivros_capitulos');
-            if (dadosCapitulos) {
-                capitulos = JSON.parse(dadosCapitulos);
-                renderizarCapitulos();
-            } else {
-                // Se não houver dados, adicione um exemplo inicial
-                capitulos = [
-                    { id: Date.now(), titulo: 'Capítulo 1: O Despertar', etapas: { escrito: false, revisado: false } }
-                ];
-                renderizarCapitulos();
-            }
-
-            // Carregar Personagens
-            const dadosPersonagens = localStorage.getItem('guiaLivros_personagens');
-            if (dadosPersonagens) {
-                personagens = JSON.parse(dadosPersonagens);
-                renderizarPersonagens();
-            } else {
-                personagens = [
-                    { id: Date.now() + 1, nome: 'Ariane', motivacao: 'Buscar a verdade.', arco: 'De cética a líder.' }
-                ];
-                renderizarPersonagens();
-            }
-        }
-
-        // --- FUNÇÕES DE RENDERIZAÇÃO E MANIPULAÇÃO DE CAPÍTULOS ---
-
-        function renderizarCapitulos() {
-            const list = document.getElementById('capitulos-list');
-            list.innerHTML = ''; // Limpa a lista antes de renderizar
-
-            capitulos.forEach(cap => {
-                const novoCap = document.createElement('div');
-                novoCap.className = 'checklist-item';
-                novoCap.id = `cap-${cap.id}`;
-                
-                novoCap.innerHTML = `
-                    <h3>${cap.titulo} <button class="remove-btn" onclick="removerItem(${cap.id}, 'capitulos')">X</button></h3>
-                    
-                    <input type="checkbox" id="cap-${cap.id}-escrito" ${cap.etapas.escrito ? 'checked' : ''} onchange="atualizarCapitulo(${cap.id}, 'escrito', this.checked)">
-                    <label for="cap-${cap.id}-escrito">Rascunho Escrito</label><br>
-                    
-                    <input type="checkbox" id="cap-${cap.id}-revisado" ${cap.etapas.revisado ? 'checked' : ''} onchange="atualizarCapitulo(${cap.id}, 'revisado', this.checked)">
-                    <label for="cap-${cap.id}-revisado">Revisão Concluída</label>
-                `;
-                list.appendChild(novoCap);
-            });
-        }
-
-        function adicionarCapitulo() {
-            const numCap = capitulos.length + 1;
-            const novoCap = { 
-                id: Date.now(), 
-                titulo: `Capítulo ${numCap}: Novo Título`, 
-                etapas: { escrito: false, revisado: false } 
-            };
-            capitulos.push(novoCap);
-            renderizarCapitulos();
-            salvarDados();
-        }
-
-        function atualizarCapitulo(id, etapa, valor) {
-            const capIndex = capitulos.findIndex(c => c.id === id);
-            if (capIndex !== -1) {
-                capitulos[capIndex].etapas[etapa] = valor;
-                salvarDados();
-            }
-        }
-
-        // --- FUNÇÕES DE RENDERIZAÇÃO E MANIPULAÇÃO DE PERSONAGENS ---
-
-        function renderizarPersonagens() {
-            const list = document.getElementById('personagens-list');
-            list.innerHTML = ''; // Limpa a lista antes de renderizar
-
-            personagens.forEach(pers => {
-                const novoPers = document.createElement('div');
-                novoPers.className = 'personagem-ficha';
-                novoPers.id = `pers-${pers.id}`;
-                
-                novoPers.innerHTML = `
-                    <h3>${pers.nome || 'Novo Personagem'} <button class="remove-btn" onclick="removerItem(${pers.id}, 'personagens')">X</button></h3>
-                    
-                    <label for="nome-${pers.id}">Nome Completo:</label>
-                    <input type="text" id="nome-${pers.id}" value="${pers.nome || ''}" onchange="atualizarPersonagem(${pers.id}, 'nome', this.value)">
-
-                    <label for="motivacao-${pers.id}">Motivação Principal:</label>
-                    <input type="text" id="motivacao-${pers.id}" value="${pers.motivacao || ''}" onchange="atualizarPersonagem(${pers.id}, 'motivacao', this.value)">
-
-                    <label for="arco-${pers.id}">Arco de Mudança (De/Para):</label>
-                    <textarea id="arco-${pers.id}" rows="3" onchange="atualizarPersonagem(${pers.id}, 'arco', this.value)">${pers.arco || ''}</textarea>
-                `;
-                list.appendChild(novoPers);
-            });
-        }
-
-        function adicionarPersonagem() {
-            const novoPers = { 
-                id: Date.now(), 
-                nome: `Novo Personagem ${personagens.length + 1}`, 
-                motivacao: '', 
-                arco: '' 
-            };
-            personagens.push(novoPers);
-            renderizarPersonagens();
-            salvarDados();
-        }
-
-        function atualizarPersonagem(id, campo, valor) {
-            const persIndex = personagens.findIndex(p => p.id === id);
-            if (persIndex !== -1) {
-                personagens[persIndex][campo] = valor;
-                // Atualiza o título na tela (caso o campo 'nome' mude)
-                if (campo === 'nome') {
-                    document.querySelector(`#pers-${id} h3`).innerHTML = `${valor} <button class="remove-btn" onclick="removerItem(${id}, 'personagens')">X</button>`;
-                }
-                salvarDados();
-            }
-        }
-
-        // --- FUNÇÃO DE REMOÇÃO GERAL ---
-
-        function removerItem(id, tipo) {
-            if (!confirm("Tem certeza que deseja remover este item?")) {
-                return;
-            }
-            if (tipo === 'capitulos') {
-                capitulos = capitulos.filter(c => c.id !== id);
-                renderizarCapitulos();
-            } else if (tipo === 'personagens') {
-                personagens = personagens.filter(p => p.id !== id);
-                renderizarPersonagens();
-            }
-            salvarDados();
-        }
-
-        // --- LÓGICA DE ABAS (Mantida do Exemplo Anterior) ---
+        // Lógica de JavaScript para alternar as abas
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
+
+            // 1. Esconde todo o conteúdo das abas
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
             }
+
+            // 2. Remove a classe 'active' de todos os botões
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
+
+            // 3. Mostra a aba atual e adiciona a classe 'active' ao botão clicado
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
 
-        // Garante que a primeira aba de "Guias" esteja ativa ao carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            const firstButton = document.querySelector('.tab-button');
-            if (firstButton) {
-                openTab({ currentTarget: firstButton }, 'Guias');
-            }
-        });
+        // Lógica básica (sem persistência) para adicionar novos itens
+        
+        function adicionarCapitulo() {
+            const list = document.getElementById('capitulos-list');
+            const novoCap = document.createElement('div');
+            novoCap.className = 'checklist-item';
+            
+            const numCap = list.children.length + 1;
+            
+            novoCap.innerHTML = `
+                <input type="checkbox" id="cap${numCap}-escrito">
+                <label for="cap${numCap}-escrito">Capítulo ${numCap}: [Novo Título] (Escrito)</label><br>
+                <input type="checkbox" id="cap${numCap}-revisao">
+                <label for="cap${numCap}-revisao">Capítulo ${numCap}: Revisado</label>
+            `;
+            list.appendChild(novoCap);
+        }
 
+        function adicionarPersonagem() {
+             const list = document.getElementById('personagens-list');
+             const novoPers = document.createElement('div');
+             novoPers.className = 'personagem-ficha';
+             
+             const numPers = list.children.length + 1;
+
+             novoPers.innerHTML = `
+                <h3>Novo Personagem ${numPers}</h3>
+                
+                <label for="nome-novo-${numPers}">Nome Completo:</label>
+                <input type="text" id="nome-novo-${numPers}" placeholder="Ex: Elara D'Arc">
+
+                <label for="motivacao-novo-${numPers}">Motivação Principal:</label>
+                <input type="text" id="motivacao-novo-${numPers}" placeholder="O que o personagem quer.">
+
+                <label for="arco-novo-${numPers}">Arco de Mudança (De/Para):</label>
+                <textarea id="arco-novo-${numPers}" rows="3" placeholder="Como o personagem muda na história."></textarea>
+             `;
+             list.appendChild(novoPers);
+        }
+        
+        // 🚨 O próximo passo seria adicionar a lógica de 'localStorage' para salvar e carregar os dados
+        // e checkboxes, pois no código acima, tudo é resetado ao recarregar a página.
     </script>
 </body>
 </html>
