@@ -3,218 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guia Interativo para Escrever Seu Livro</title>
+    <title>Guia Interativo para Escrever Livros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos CSS para as Abas */
-        .tab-container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 20px auto;
-            border: 1px solid #ccc; /* Bordas ao redor do conteúdo */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
         }
-
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
         }
-
-        .tab-button {
-            background-color: #f1f1f1;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-            font-size: 17px;
-            border-radius: 8px 8px 0 0;
-            margin-right: 5px;
-            font-weight: bold;
+        .nav-link {
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
-
-        .tab-button:hover {
-            background-color: #ddd;
+        .nav-link.active {
+            background-color: #57534e;
+            color: #f5f5f4;
+            border-color: #57534e;
         }
-
-        .tab-button.active {
-            background-color: #fff;
-            border-bottom: 2px solid #4CAF50; /* Cor de destaque da aba ativa */
-            color: #4CAF50;
+        .nav-link:not(.active):hover {
+            background-color: #d6d3d1;
+            color: #57534e;
         }
-
-        .tab-content {
-            display: none; /* Esconde o conteúdo por padrão */
-            padding: 6px 12px;
-            border-top: none;
-        }
-
-        /* Estilos para o Checklist e Fichas */
-        .checklist-item, .personagem-ficha {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            border-left: 5px solid #4CAF50;
-        }
-
-        .personagem-ficha label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        .personagem-ficha input[type="text"], .personagem-ficha textarea {
-            width: 98%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-        }
-
-        /* Aqui você deve colocar os estilos do seu site original, como para H1, H2, etc. */
-        h1 { color: #333; }
-        /* ... outros estilos ... */
     </style>
 </head>
-<body>
+<body class="font-sans bg-stone-100 text-stone-700 antialiased">
 
-    <header>
-        <h1>Guia Interativo para Escrever Seu Livro</h1>
-        <p>Uma ferramenta para navegar pelas etapas da concepção à publicação, agora com recursos interativos!</p>
-    </header>
-
-    <div class="tab-container">
+    <div class="container mx-auto max-w-7xl p-4 md:p-8">
         
-        <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab(event, 'Guias')">📚 Guias e Fases</button>
-            <button class="tab-button" onclick="openTab(event, 'ChecklistCapitulos')">📝 Checklist de Capítulos</button>
-            <button class="tab-button" onclick="openTab(event, 'FichaPersonagens')">🎭 Ficha de Personagens</button>
-        </div>
+        <!-- Cabeçalho -->
+        <header class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-800 text-center mb-2">Guia Interativo para Escrever Seu Livro</h1>
+            <p class="text-lg text-stone-600 text-center max-w-3xl mx-auto">Uma ferramenta para navegar pelas etapas da concepção à publicação.</p>
+        </header>
 
-        <div id="Guias" class="tab-content" style="display: block;">
-            <h2>Visão Geral das Fases</h2>
-            <p>Este é o conteúdo principal do seu guia, com as seções de Planejamento, 1º Rascunho, Revisão e Finalização.</p>
-            </div>
+        <!-- Estrutura Principal: Navegação + Conteúdo -->
+        <div class="flex flex-col md:flex-row gap-8">
 
-        <div id="ChecklistCapitulos" class="tab-content">
-            <h2>📝 Acompanhamento de Capítulos</h2>
-            <p>Use esta seção para acompanhar o progresso de cada capítulo da sua obra. Marque o que já está completo.</p>
-            
-            <div id="capitulos-list">
-                <div class="checklist-item">
-                    <input type="checkbox" id="cap1-completo">
-                    <label for="cap1-completo">Capítulo 1: O Despertar (Escrito)</label><br>
-                    <input type="checkbox" id="cap1-revisao">
-                    <label for="cap1-revisao">Capítulo 1: Revisado Estruturalmente</label>
-                </div>
+            <!-- Navegação Lateral/Abas -->
+            <nav class="md:w-1/4">
+                <ul class="flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible space-x-2 md:space-x-0 md:space-y-2">
+                    <li>
+                        <button class="nav-link active w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-overview">
+                            Visão Geral
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase1">
+                            Fase 1: Planejamento
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase2">
+                            Fase 2: 1º Rascunho
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase3">
+                            Fase 3: Revisão
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase4">
+                            Fase 4: Finalização
+                        </button>
+                    </li>
+                </ul>
+            </nav>
 
-                <div class="checklist-item">
-                    <input type="checkbox" id="cap2-completo">
-                    <label for="cap2-completo">Capítulo 2: A Jornada Começa (Escrito)</label>
-                </div>
-            </div>
-            
-            <button onclick="adicionarCapitulo()">+ Adicionar Novo Capítulo</button>
-        </div>
-
-        <div id="FichaPersonagens" class="tab-content">
-            <h2>🎭 Fichas de Personagens</h2>
-            <p>Crie e organize as fichas detalhadas para seus personagens principais.</p>
-            
-            <div id="personagens-list">
-                <div class="personagem-ficha">
-                    <h3>Personagem Principal: Ariane</h3>
-                    
-                    <label for="nome-ariane">Nome Completo:</label>
-                    <input type="text" id="nome-ariane" value="Ariane Silva">
-
-                    <label for="motivacao-ariane">Motivação Principal:</label>
-                    <input type="text" id="motivacao-ariane" value="Buscar a vingança pela família.">
-
-                    <label for="arco-ariane">Arco de Mudança (De/Para):</label>
-                    <textarea id="arco-ariane" rows="3">De fria e implacável para alguém que aprende a confiar nos outros.</textarea>
-                </div>
+            <!-- Painel de Conteúdo -->
+            <main class="md:w-3/4">
                 
-                <div class="personagem-ficha">
-                    <h3>Antagonista: Kael</h3>
-                    <label for="nome-kael">Nome Completo:</label>
-                    <input type="text" id="nome-kael" value="Kael, O Observador">
-                    
+                <!-- CONTEÚDO: Visão Geral -->
+                <section class="content-panel active" id="content-overview">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">Visão Geral das Fases</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Escrever um livro é um processo que equilibra diferentes habilidades ao longo do tempo. Algumas fases exigem mais criatividade pura, enquanto outras demandam mais esforço analítico e disciplina. Este gráfico compara o foco principal de cada fase.
+                        </p>
+                        <div class="chart-container">
+                            <canvas id="phaseFocusChart"></canvas>
+                        </div>
+                        <p class="text-sm text-stone-500 text-center mt-4">
+                            Use este gráfico para entender onde sua energia será mais necessária em cada etapa da jornada.
+                        </p>
                     </div>
-            </div>
+                </section>
 
-            <button onclick="adicionarPersonagem()">+ Adicionar Novo Personagem</button>
+                <!-- CONTEÚDO: Fase 1 -->
+                <section class="content-panel hidden" id="content-fase1">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 1: Planejamento e Estrutura</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Esta é a fundação do seu livro. Não pule esta etapa, pois ela economizará tempo e evitará bloqueios criativos mais tarde.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Defina a Ideia Central e o Gênero</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">A "Centelha":</strong> Qual é a premissa única da sua história? Se for não-ficção, qual é a tese principal?</li>
+                                    <li><strong class="text-stone-700">Gênero:</strong> Determine o gênero (Ficção Científica, Romance, Autoajuda, etc.) para definir as expectativas do leitor.</li>
+                                    <li><strong class="text-stone-700">Público-Alvo:</strong> Para quem você está escrevendo? Isso define a linguagem, o ritmo e os temas.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Desenho de Personagens e Cenários</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Personagens Principais:</strong> Crie fichas detalhadas (motivações, medos, falhas, objetivos).</li>
+                                    <li><strong class="text-stone-700">Arco do Personagem:</strong> Como o protagonista mudará da primeira à última página?</li>
+                                    <li><strong class="text-stone-700">Construção de Mundo:</strong> Descreva os cenários principais e estabeleça as regras do seu mundo.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Esboço (Outline)</h3>
+                                <p class="text-stone-600 mb-4">Crie um mapa para evitar que você se perca. Liste os eventos principais ou tópicos por capítulo.</p>
+                                
+                                <h4 class="text-lg font-semibold text-stone-700 mt-4 mb-3">Exemplo: Estrutura de Três Atos (Ficção)</h4>
+                                <div class="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 p-4 bg-stone-50 rounded-lg border border-stone-200">
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato I: Início</h5>
+                                        <p class="text-sm text-stone-600">Apresentação, Ponto de Virada 1</p>
+                                    </div>
+                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato II: Conflito</h5>
+                                        <p class="text-sm text-stone-600">Obstáculos, Clímax Intermediário</p>
+                                    </div>
+                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato III: Resolução</h5>
+                                        <p class="text-sm text-stone-600">Clímax Final, Desfecho</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOVO RECURSO GEMINI: Gerador de Premissas -->
+                        <div class="mt-8 pt-6 border-t border-stone-200">
+                            <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+                                Gerador de Premissas e Ideias ✨
+                            </h3>
+                            <p class="text-stone-600 mb-4">
+                                Use a IA para transformar um conceito vago em 3 a 5 ideias de premissas atraentes.
+                            </p>
+
+                            <div class="bg-stone-50 p-4 rounded-lg space-y-3">
+                                <div>
+                                    <label for="input-genre" class="block text-sm font-medium text-stone-700">Gênero (Ex: Ficção Científica, Thriller)</label>
+                                    <input type="text" id="input-genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="Fantasia Épica">
+                                </div>
+                                <div>
+                                    <label for="input-theme" class="block text-sm font-medium text-stone-700">Tema Principal (Ex: Redenção, Inteligência Artificial)</label>
+                                    <input type="text" id="input-theme" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="Viagem no Tempo">
+                                </div>
+                                <div>
+                                    <label for="input-protagonist" class="block text-sm font-medium text-stone-700">Tipo de Protagonista (Ex: Jovem Orfão, Detetive Cínico)</label>
+                                    <input type="text" id="input-protagonist" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="Um gato falante">
+                                </div>
+                                
+                                <button id="generate-premises-btn" class="w-full bg-stone-700 hover:bg-stone-800 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Gerar Ideias de Livros ✨
+                                </button>
+                            </div>
+
+                            <div id="loading-indicator" class="hidden mt-4 p-3 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-lg text-center">
+                                Gerando ideias criativas... por favor, aguarde.
+                            </div>
+
+                            <div id="premises-results" class="mt-4 space-y-4">
+                                <!-- Resultados aparecerão aqui -->
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 2 -->
+                <section class="content-panel hidden" id="content-fase2">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 2: A Escrita do Primeiro Rascunho</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Esta é a fase de pura criação. A regra de ouro aqui é: <strong class="text-stone-900">Escreva, Não Edite.</strong> O objetivo é terminar.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Estabeleça uma Rotina de Escrita</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Metas Diárias:</strong> Defina uma meta de palavras ou tempo (ex: 500 palavras ou 1 hora). A consistência é mais importante que a intensidade.</li>
+                                    <li><strong class="text-stone-700">Encontre seu Lugar:</strong> Escolha um local e um horário dedicados para escrever.</li>
+                                    <li><strong class="text-stone-700">Desligue o Crítico Interno:</strong> Permita-se escrever mal. O primeiro rascunho é onde você conta a história para si mesmo.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Siga o Fluxo</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Ignore Buracos na Trama:</strong> Se travar, deixe uma nota (ex: `[RESOLVER DEPOIS]`) e siga em frente.</li>
+                                    <li><strong class="text-stone-700">Mantenha o Ritmo:</strong> Tente escrever cada capítulo do início ao fim sem voltar para polir frases.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 3 -->
+                <section class="content-panel hidden" id="content-fase3">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 3: Revisão, Edição e Polimento</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Parabéns! Você tem o primeiro rascunho. Agora, o trabalho de verdade começa.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. O Distanciamento (A Fase de Repouso)</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Afaste-se:</strong> Coloque o manuscrito de lado por duas a quatro semanas. Isso permite que você volte ao texto com olhos frescos.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Revisão Estrutural (A Grande Revisão)</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Leia Como um Leitor:</strong> Concentre-se nas questões macro. O ritmo funciona? A motivação é clara? O final é satisfatório?</li>
+                                    <li><strong class="text-stone-700">Grandes Cortes/Reescritas:</strong> Seja implacável. É comum ter que cortar capítulos inteiros ou reorganizar seções.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. Edição de Linha e Copidesque</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Clareza e Voz:</strong> Concentre-se nas frases. As palavras escolhidas transmitem o significado exato?</li>
+                                    <li><strong class="text-stone-700">Gramática e Ortografia:</strong> Corrija erros gramaticais, de pontuação e ortográficos.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">4. Beta Readers e Revisores Profissionais</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Beta Readers:</strong> Peça a leitores de confiança para identificarem falhas que você não consegue ver.</li>
+                                    <li><strong class="text-stone-700">Revisor Profissional:</strong> Se o objetivo for publicar, o investimento em um profissional é crucial.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 4 -->
+                <section class="content-panel hidden" id="content-fase4">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 4: Finalização</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Você está quase lá! Esta fase prepara seu manuscrito polido para o mundo.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Título Final</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Garanta que o título seja atraente e represente o conteúdo.</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Sinopse / Texto de Contracapa</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Escreva um resumo conciso e instigante que será usado para a divulgação.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Caminho da Publicação</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Decida se você buscará uma editora (Publicação Tradicional) ou se publicará por conta própria (Publicação Independente).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
         </div>
-
     </div>
 
     <script>
-        // Lógica de JavaScript para alternar as abas
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Lógica de Navegação por Abas
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentPanels = document.querySelectorAll('.content-panel');
 
-            // 1. Esconde todo o conteúdo das abas
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.getAttribute('data-target');
+
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+
+                    contentPanels.forEach(panel => {
+                        if (panel.id === targetId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Lógica do Gráfico (Chart.js)
+            const ctx = document.getElementById('phaseFocusChart').getContext('2d');
+            
+            const data = {
+                labels: ['Esforço Analítico', 'Tempo Gasto', 'Criatividade Pura', 'Disciplina'],
+                datasets: [
+                    {
+                        label: 'Fase 1: Planejamento',
+                        data: [8, 4, 9, 6],
+                        fill: true,
+                        backgroundColor: 'rgba(87, 83, 78, 0.2)',
+                        borderColor: 'rgb(87, 83, 78)',
+                        pointBackgroundColor: 'rgb(87, 83, 78)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(87, 83, 78)'
+                    },
+                    {
+                        label: 'Fase 2: 1º Rascunho',
+                        data: [3, 9, 10, 8],
+                        fill: true,
+                        backgroundColor: 'rgba(168, 162, 158, 0.2)',
+                        borderColor: 'rgb(168, 162, 158)',
+                        pointBackgroundColor: 'rgb(168, 162, 158)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(168, 162, 158)'
+                    },
+                    {
+                        label: 'Fase 3: Revisão',
+                        data: [10, 7, 5, 9],
+                        fill: true,
+                        backgroundColor: 'rgba(214, 211, 209, 0.2)',
+                        borderColor: 'rgb(214, 211, 209)',
+                        pointBackgroundColor: 'rgb(214, 211, 209)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(214, 211, 209)'
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#d6d3d1'
+                            },
+                            grid: {
+                                color: '#d6d3d1'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#57534e'
+                            },
+                            ticks: {
+                                backdropColor: '#f5f5f4',
+                                color: '#78716c',
+                                stepSize: 2
+                            },
+                            min: 0,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) {
+                                      return label.join(' ');
+                                    } else {
+                                      return label;
+                                    }
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#57534e',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+
+            // Gemini API Configuration
+            const API_KEY = ""; // Kept empty as per instructions
+            const MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+
+            // Utility function for exponential backoff (retry logic)
+            async function fetchApi(payload, maxRetries = 5) {
+                let lastError = null;
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            // Check if it's a rate limit error (e.g., 429)
+                            if (response.status === 429 || response.status >= 500) {
+                                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                            }
+                            // For other client errors, don't retry, just fail fast
+                            const errorJson = await response.json();
+                            throw new Error(`API Client Error: ${JSON.stringify(errorJson)}`);
+                        }
+
+                        return await response.json();
+                    } catch (error) {
+                        lastError = error;
+                        if (i < maxRetries - 1) {
+                            const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+                    }
+                }
+                throw new Error("Falha na chamada à API após várias tentativas: " + lastError.message);
             }
 
-            // 2. Remove a classe 'active' de todos os botões
-            tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
+            // Main LLM generation function
+            async function generatePremises() {
+                const genre = document.getElementById('input-genre').value.trim();
+                const theme = document.getElementById('input-theme').value.trim();
+                const protagonist = document.getElementById('input-protagonist').value.trim();
+                const resultsDiv = document.getElementById('premises-results');
+                const loadingDiv = document.getElementById('loading-indicator');
+                const button = document.getElementById('generate-premises-btn');
 
-            // 3. Mostra a aba atual e adiciona a classe 'active' ao botão clicado
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
+                if (!genre && !theme && !protagonist) {
+                    resultsDiv.innerHTML = `<p class="text-red-600 p-3 bg-red-100 rounded-lg">Por favor, preencha pelo menos um campo para gerar ideias.</p>`;
+                    return;
+                }
 
-        // Lógica básica (sem persistência) para adicionar novos itens
-        
-        function adicionarCapitulo() {
-            const list = document.getElementById('capitulos-list');
-            const novoCap = document.createElement('div');
-            novoCap.className = 'checklist-item';
-            
-            const numCap = list.children.length + 1;
-            
-            novoCap.innerHTML = `
-                <input type="checkbox" id="cap${numCap}-escrito">
-                <label for="cap${numCap}-escrito">Capítulo ${numCap}: [Novo Título] (Escrito)</label><br>
-                <input type="checkbox" id="cap${numCap}-revisao">
-                <label for="cap${numCap}-revisao">Capítulo ${numCap}: Revisado</label>
-            `;
-            list.appendChild(novoCap);
-        }
-
-        function adicionarPersonagem() {
-             const list = document.getElementById('personagens-list');
-             const novoPers = document.createElement('div');
-             novoPers.className = 'personagem-ficha';
-             
-             const numPers = list.children.length + 1;
-
-             novoPers.innerHTML = `
-                <h3>Novo Personagem ${numPers}</h3>
+                button.disabled = true;
+                button.classList.add('opacity-50');
+                loadingDiv.classList.remove('hidden');
+                resultsDiv.innerHTML = '';
                 
-                <label for="nome-novo-${numPers}">Nome Completo:</label>
-                <input type="text" id="nome-novo-${numPers}" placeholder="Ex: Elara D'Arc">
+                const systemPrompt = `Você é um curador de histórias e copywriter criativo de Hollywood. Sua tarefa é criar 5 premissas de livros curtas, instigantes e únicas (loglines) baseadas nos elementos fornecidos pelo usuário. Cada premissa deve ter no máximo duas frases. Formate sua resposta como uma lista numerada concisa.`;
+                
+                const userQuery = `Gênero: ${genre || 'Não especificado'}. Tema: ${theme || 'Não especificado'}. Protagonista: ${protagonist || 'Não especificado'}. Gere as premissas em Português do Brasil.`;
 
-                <label for="motivacao-novo-${numPers}">Motivação Principal:</label>
-                <input type="text" id="motivacao-novo-${numPers}" placeholder="O que o personagem quer.">
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    // Using Google Search grounding for fresh, grounded ideas based on real genres/tropes
+                    tools: [{ "google_search": {} }]
+                };
 
-                <label for="arco-novo-${numPers}">Arco de Mudança (De/Para):</label>
-                <textarea id="arco-novo-${numPers}" rows="3" placeholder="Como o personagem muda na história."></textarea>
-             `;
-             list.appendChild(novoPers);
-        }
-        
-        // 🚨 O próximo passo seria adicionar a lógica de 'localStorage' para salvar e carregar os dados
-        // e checkboxes, pois no código acima, tudo é resetado ao recarregar a página.
+                try {
+                    const response = await fetchApi(payload);
+                    const candidate = response.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        const text = candidate.content.parts[0].text;
+                        
+                        // Format the output
+                        resultsDiv.innerHTML = `
+                            <h4 class="text-xl font-semibold text-stone-700 mb-3">Ideias Geradas:</h4>
+                            <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 prose prose-stone max-w-none">
+                                ${text.split('\n').filter(line => line.trim()).map(line => `<p class="mb-2">${line.replace(/^-/g, '•')}</p>`).join('')}
+                            </div>
+                        `;
+
+                    } else {
+                        resultsDiv.innerHTML = `<p class="text-red-600 p-3 bg-red-100 rounded-lg">Erro ao gerar conteúdo. Tente novamente.</p>`;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML = `<p class="text-red-600 p-3 bg-red-100 rounded-lg">Erro na comunicação com a IA: ${error.message}</p>`;
+                    console.error('Gemini API Error:', error);
+                } finally {
+                    loadingDiv.classList.add('hidden');
+                    button.disabled = false;
+                    button.classList.remove('opacity-50');
+                }
+            }
+
+            // Event listener for the new button
+            document.getElementById('generate-premises-btn').addEventListener('click', generatePremises);
+        });
     </script>
 </body>
 </html>
