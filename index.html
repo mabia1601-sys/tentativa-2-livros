@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Interativo para Escrever Livros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Calm & steady -->
+    <!-- Application Structure Plan: O "Relatório Fonte" é um guia de processo linear e textual, inadequado para um layout de dashboard. A melhor estrutura de informação é uma SPA temática com navegação principal (abas). O usuário clica em uma das 5 seções (Visão Geral, Fase 1, Fase 2, Fase 3, Fase 4) e o painel de conteúdo principal atualiza-se dinamicamente (via JS) para mostrar apenas os detalhes dessa seção. Isso transforma um documento de rolagem longo em uma ferramenta de consulta interativa e focada, melhorando drasticamente a usabilidade e a navegação. -->
+    <!-- Visualization & Content Choices: 
+        1. Conteúdo Principal (4 Fases): Meta: Organizar. Método: Abas interativas (HTML/CSS/JS). Interação: Clique para exibir/ocultar conteúdo da fase. Justificativa: Transforma texto linear em app focado.
+        2. Esforço por Fase: Meta: Comparar. Método: Gráfico de Radar (Chart.js/Canvas). Interação: Hover. Justificativa: Adiciona o elemento obrigatório de visualização de dados (Chart.js) para comparar conceitualmente o esforço, tempo e criatividade necessários em cada fase.
+        3. Estrutura de Três Atos (Fase 1): Meta: Organizar (Processo). Método: Diagrama de fluxo (HTML/Tailwind Flexbox). Interação: Nenhuma (visual). Justificativa: Visualiza o fluxo da história melhor que texto puro. (SEM SVG/Mermaid).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .nav-link.active {
+            background-color: #57534e;
+            color: #f5f5f4;
+            border-color: #57534e;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #d6d3d1;
+            color: #57534e;
+        }
+    </style>
+</head>
+<body class="font-sans bg-stone-100 text-stone-700 antialiased">
+
+    <div class="container mx-auto max-w-7xl p-4 md:p-8">
+        
+        <!-- Cabeçalho -->
+        <header class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-800 text-center mb-2">Guia Interativo para Escrever Seu Livro</h1>
+            <p class="text-lg text-stone-600 text-center max-w-3xl mx-auto">Uma ferramenta para navegar pelas etapas da concepção à publicação.</p>
+        </header>
+
+        <!-- Estrutura Principal: Navegação + Conteúdo -->
+        <div class="flex flex-col md:flex-row gap-8">
+
+            <!-- Navegação Lateral/Abas -->
+            <nav class="md:w-1/4">
+                <ul class="flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible space-x-2 md:space-x-0 md:space-y-2">
+                    <li>
+                        <button class="nav-link active w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-overview">
+                            Visão Geral
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase1">
+                            Fase 1: Planejamento
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase2">
+                            Fase 2: 1º Rascunho
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase3">
+                            Fase 3: Revisão
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase4">
+                            Fase 4: Finalização
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Painel de Conteúdo -->
+            <main class="md:w-3/4">
+                
+                <!-- CONTEÚDO: Visão Geral -->
+                <section class="content-panel active" id="content-overview">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">Visão Geral das Fases</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Escrever um livro é um processo que equilibra diferentes habilidades ao longo do tempo. Algumas fases exigem mais criatividade pura, enquanto outras demandam mais esforço analítico e disciplina. Este gráfico compara o foco principal de cada fase.
+                        </p>
+                        <div class="chart-container">
+                            <canvas id="phaseFocusChart"></canvas>
+                        </div>
+                        <p class="text-sm text-stone-500 text-center mt-4">
+                            Use este gráfico para entender onde sua energia será mais necessária em cada etapa da jornada.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 1 -->
+                <section class="content-panel hidden" id="content-fase1">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 1: Planejamento e Estrutura</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Esta é a fundação do seu livro. Não pule esta etapa, pois ela economizará tempo e evitará bloqueios criativos mais tarde.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Defina a Ideia Central e o Gênero</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">A "Centelha":</strong> Qual é a premissa única da sua história? Se for não-ficção, qual é a tese principal?</li>
+                                    <li><strong class="text-stone-700">Gênero:</strong> Determine o gênero (Ficção Científica, Romance, Autoajuda, etc.) para definir as expectativas do leitor.</li>
+                                    <li><strong class="text-stone-700">Público-Alvo:</strong> Para quem você está escrevendo? Isso define a linguagem, o ritmo e os temas.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Desenho de Personagens e Cenários</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Personagens Principais:</strong> Crie fichas detalhadas (motivações, medos, falhas, objetivos).</li>
+                                    <li><strong class="text-stone-700">Arco do Personagem:</strong> Como o protagonista mudará da primeira à última página?</li>
+                                    <li><strong class="text-stone-700">Construção de Mundo:</strong> Descreva os cenários principais e estabeleça as regras do seu mundo.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Esboço (Outline)</h3>
+                                <p class="text-stone-600 mb-4">Crie um mapa para evitar que você se perca. Liste os eventos principais ou tópicos por capítulo.</p>
+                                
+                                <h4 class="text-lg font-semibold text-stone-700 mt-4 mb-3">Exemplo: Estrutura de Três Atos (Ficção)</h4>
+                                <div class="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 p-4 bg-stone-50 rounded-lg border border-stone-200">
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato I: Início</h5>
+                                        <p class="text-sm text-stone-600">Apresentação, Ponto de Virada 1</p>
+                                    </div>
+                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato II: Conflito</h5>
+                                        <p class="text-sm text-stone-600">Obstáculos, Clímax Intermediário</p>
+                                    </div>
+                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
+                                        <h5 class="font-bold text-stone-700">Ato III: Resolução</h5>
+                                        <p class="text-sm text-stone-600">Clímax Final, Desfecho</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 2 -->
+                <section class="content-panel hidden" id="content-fase2">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 2: A Escrita do Primeiro Rascunho</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Esta é a fase de pura criação. A regra de ouro aqui é: <strong class="text-stone-900">Escreva, Não Edite.</strong> O objetivo é terminar.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Estabeleça uma Rotina de Escrita</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Metas Diárias:</strong> Defina uma meta de palavras ou tempo (ex: 500 palavras ou 1 hora). A consistência é mais importante que a intensidade.</li>
+                                    <li><strong class="text-stone-700">Encontre seu Lugar:</strong> Escolha um local e um horário dedicados para escrever.</li>
+                                    <li><strong class="text-stone-700">Desligue o Crítico Interno:</strong> Permita-se escrever mal. O primeiro rascunho é onde você conta a história para si mesmo.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Siga o Fluxo</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Ignore Buracos na Trama:</strong> Se travar, deixe uma nota (ex: `[RESOLVER DEPOIS]`) e siga em frente.</li>
+                                    <li><strong class="text-stone-700">Mantenha o Ritmo:</strong> Tente escrever cada capítulo do início ao fim sem voltar para polir frases.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 3 -->
+                <section class="content-panel hidden" id="content-fase3">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 3: Revisão, Edição e Polimento</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Parabéns! Você tem o primeiro rascunho. Agora, o trabalho de verdade começa.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. O Distanciamento (A Fase de Repouso)</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Afaste-se:</strong> Coloque o manuscrito de lado por duas a quatro semanas. Isso permite que você volte ao texto com olhos frescos.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Revisão Estrutural (A Grande Revisão)</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Leia Como um Leitor:</strong> Concentre-se nas questões macro. O ritmo funciona? A motivação é clara? O final é satisfatório?</li>
+                                    <li><strong class="text-stone-700">Grandes Cortes/Reescritas:</strong> Seja implacável. É comum ter que cortar capítulos inteiros ou reorganizar seções.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. Edição de Linha e Copidesque</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Clareza e Voz:</strong> Concentre-se nas frases. As palavras escolhidas transmitem o significado exato?</li>
+                                    <li><strong class="text-stone-700">Gramática e Ortografia:</strong> Corrija erros gramaticais, de pontuação e ortográficos.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">4. Beta Readers e Revisores Profissionais</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li><strong class="text-stone-700">Beta Readers:</strong> Peça a leitores de confiança para identificarem falhas que você não consegue ver.</li>
+                                    <li><strong class="text-stone-700">Revisor Profissional:</strong> Se o objetivo for publicar, o investimento em um profissional é crucial.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTEÚDO: Fase 4 -->
+                <section class="content-panel hidden" id="content-fase4">
+                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 4: Finalização</h2>
+                        <p class="text-lg text-stone-600 mb-6">
+                            Você está quase lá! Esta fase prepara seu manuscrito polido para o mundo.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Título Final</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Garanta que o título seja atraente e represente o conteúdo.</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Sinopse / Texto de Contracapa</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Escreva um resumo conciso e instigante que será usado para a divulgação.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Caminho da Publicação</h3>
+                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
+                                    <li>Decida se você buscará uma editora (Publicação Tradicional) ou se publicará por conta própria (Publicação Independente).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Lógica de Navegação por Abas
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentPanels = document.querySelectorAll('.content-panel');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.getAttribute('data-target');
+
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+
+                    contentPanels.forEach(panel => {
+                        if (panel.id === targetId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Lógica do Gráfico (Chart.js)
+            const ctx = document.getElementById('phaseFocusChart').getContext('2d');
+            
+            const data = {
+                labels: ['Esforço Analítico', 'Tempo Gasto', 'Criatividade Pura', 'Disciplina'],
+                datasets: [
+                    {
+                        label: 'Fase 1: Planejamento',
+                        data: [8, 4, 9, 6],
+                        fill: true,
+                        backgroundColor: 'rgba(87, 83, 78, 0.2)',
+                        borderColor: 'rgb(87, 83, 78)',
+                        pointBackgroundColor: 'rgb(87, 83, 78)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(87, 83, 78)'
+                    },
+                    {
+                        label: 'Fase 2: 1º Rascunho',
+                        data: [3, 9, 10, 8],
+                        fill: true,
+                        backgroundColor: 'rgba(168, 162, 158, 0.2)',
+                        borderColor: 'rgb(168, 162, 158)',
+                        pointBackgroundColor: 'rgb(168, 162, 158)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(168, 162, 158)'
+                    },
+                    {
+                        label: 'Fase 3: Revisão',
+                        data: [10, 7, 5, 9],
+                        fill: true,
+                        backgroundColor: 'rgba(214, 211, 209, 0.2)',
+                        borderColor: 'rgb(214, 211, 209)',
+                        pointBackgroundColor: 'rgb(214, 211, 209)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(214, 211, 209)'
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#d6d3d1'
+                            },
+                            grid: {
+                                color: '#d6d3d1'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#57534e'
+                            },
+                            ticks: {
+                                backdropColor: '#f5f5f4',
+                                color: '#78716c',
+                                stepSize: 2
+                            },
+                            min: 0,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) {
+                                      return label.join(' ');
+                                    } else {
+                                      return label;
+                                    }
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#57534e',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>
