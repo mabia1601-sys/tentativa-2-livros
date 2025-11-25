@@ -3,401 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guia Interativo para Escrever Livros</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Calm & steady -->
-    <!-- Application Structure Plan: O "Relatório Fonte" é um guia de processo linear e textual, inadequado para um layout de dashboard. A melhor estrutura de informação é uma SPA temática com navegação principal (abas). O usuário clica em uma das 5 seções (Visão Geral, Fase 1, Fase 2, Fase 3, Fase 4) e o painel de conteúdo principal atualiza-se dinamicamente (via JS) para mostrar apenas os detalhes dessa seção. Isso transforma um documento de rolagem longo em uma ferramenta de consulta interativa e focada, melhorando drasticamente a usabilidade e a navegação. -->
-    <!-- Visualization & Content Choices: 
-        1. Conteúdo Principal (4 Fases): Meta: Organizar. Método: Abas interativas (HTML/CSS/JS). Interação: Clique para exibir/ocultar conteúdo da fase. Justificativa: Transforma texto linear em app focado.
-        2. Esforço por Fase: Meta: Comparar. Método: Gráfico de Radar (Chart.js/Canvas). Interação: Hover. Justificativa: Adiciona o elemento obrigatório de visualização de dados (Chart.js) para comparar conceitualmente o esforço, tempo e criatividade necessários em cada fase.
-        3. Estrutura de Três Atos (Fase 1): Meta: Organizar (Processo). Método: Diagrama de fluxo (HTML/Tailwind Flexbox). Interação: Nenhuma (visual). Justificativa: Visualiza o fluxo da história melhor que texto puro. (SEM SVG/Mermaid).
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Guia Interativo para Escrever Seu Livro</title>
     <style>
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
+        /* Estilos CSS para as Abas (Mantidos do Exemplo Anterior) */
+        body { font-family: sans-serif; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #333; }
+
+        .tab-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
         }
-        .nav-link {
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+
+        .tab-button {
+            background-color: #f1f1f1;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
         }
-        .nav-link.active {
-            background-color: #57534e;
-            color: #f5f5f4;
-            border-color: #57534e;
+
+        .tab-button:hover {
+            background-color: #ddd;
         }
-        .nav-link:not(.active):hover {
-            background-color: #d6d3d1;
-            color: #57534e;
+
+        .tab-button.active {
+            background-color: #fff;
+            border-bottom: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+
+        /* Estilos para o Checklist e Fichas */
+        .checklist-item, .personagem-ficha {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 5px solid #4CAF50;
+        }
+        .checklist-item label {
+            margin-left: 5px;
+        }
+
+        .personagem-ficha label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .personagem-ficha input[type="text"], .personagem-ficha textarea {
+            width: 98%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .remove-btn {
+            float: right;
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
         }
     </style>
 </head>
-<body class="font-sans bg-stone-100 text-stone-700 antialiased">
+<body onload="carregarDados()"> <header>
+        <h1>Guia Interativo para Escrever Seu Livro</h1>
+        <p>Uma ferramenta para navegar pelas etapas da concepção à publicação, agora com recursos interativos!</p>
+    </header>
 
-    <div class="container mx-auto max-w-7xl p-4 md:p-8">
+    <div class="tab-container">
         
-        <!-- Cabeçalho -->
-        <header class="mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-stone-800 text-center mb-2">Guia Interativo para Escrever Seu Livro</h1>
-            <p class="text-lg text-stone-600 text-center max-w-3xl mx-auto">Uma ferramenta para navegar pelas etapas da concepção à publicação.</p>
-        </header>
-
-        <!-- Estrutura Principal: Navegação + Conteúdo -->
-        <div class="flex flex-col md:flex-row gap-8">
-
-            <!-- Navegação Lateral/Abas -->
-            <nav class="md:w-1/4">
-                <ul class="flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible space-x-2 md:space-x-0 md:space-y-2">
-                    <li>
-                        <button class="nav-link active w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-overview">
-                            Visão Geral
-                        </button>
-                    </li>
-                    <li>
-                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase1">
-                            Fase 1: Planejamento
-                        </button>
-                    </li>
-                    <li>
-                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase2">
-                            Fase 2: 1º Rascunho
-                        </button>
-                    </li>
-                    <li>
-                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase3">
-                            Fase 3: Revisão
-                        </button>
-                    </li>
-                    <li>
-                        <button class="nav-link w-full text-left py-3 px-4 rounded-lg font-semibold border border-stone-300 bg-white" data-target="content-fase4">
-                            Fase 4: Finalização
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Painel de Conteúdo -->
-            <main class="md:w-3/4">
-                
-                <!-- CONTEÚDO: Visão Geral -->
-                <section class="content-panel active" id="content-overview">
-                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-3xl font-bold text-stone-800 mb-4">Visão Geral das Fases</h2>
-                        <p class="text-lg text-stone-600 mb-6">
-                            Escrever um livro é um processo que equilibra diferentes habilidades ao longo do tempo. Algumas fases exigem mais criatividade pura, enquanto outras demandam mais esforço analítico e disciplina. Este gráfico compara o foco principal de cada fase.
-                        </p>
-                        <div class="chart-container">
-                            <canvas id="phaseFocusChart"></canvas>
-                        </div>
-                        <p class="text-sm text-stone-500 text-center mt-4">
-                            Use este gráfico para entender onde sua energia será mais necessária em cada etapa da jornada.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- CONTEÚDO: Fase 1 -->
-                <section class="content-panel hidden" id="content-fase1">
-                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 1: Planejamento e Estrutura</h2>
-                        <p class="text-lg text-stone-600 mb-6">
-                            Esta é a fundação do seu livro. Não pule esta etapa, pois ela economizará tempo e evitará bloqueios criativos mais tarde.
-                        </p>
-
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Defina a Ideia Central e o Gênero</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">A "Centelha":</strong> Qual é a premissa única da sua história? Se for não-ficção, qual é a tese principal?</li>
-                                    <li><strong class="text-stone-700">Gênero:</strong> Determine o gênero (Ficção Científica, Romance, Autoajuda, etc.) para definir as expectativas do leitor.</li>
-                                    <li><strong class="text-stone-700">Público-Alvo:</strong> Para quem você está escrevendo? Isso define a linguagem, o ritmo e os temas.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Desenho de Personagens e Cenários</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Personagens Principais:</strong> Crie fichas detalhadas (motivações, medos, falhas, objetivos).</li>
-                                    <li><strong class="text-stone-700">Arco do Personagem:</strong> Como o protagonista mudará da primeira à última página?</li>
-                                    <li><strong class="text-stone-700">Construção de Mundo:</strong> Descreva os cenários principais e estabeleça as regras do seu mundo.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Esboço (Outline)</h3>
-                                <p class="text-stone-600 mb-4">Crie um mapa para evitar que você se perca. Liste os eventos principais ou tópicos por capítulo.</p>
-                                
-                                <h4 class="text-lg font-semibold text-stone-700 mt-4 mb-3">Exemplo: Estrutura de Três Atos (Ficção)</h4>
-                                <div class="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 p-4 bg-stone-50 rounded-lg border border-stone-200">
-                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
-                                        <h5 class="font-bold text-stone-700">Ato I: Início</h5>
-                                        <p class="text-sm text-stone-600">Apresentação, Ponto de Virada 1</p>
-                                    </div>
-                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
-                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
-                                        <h5 class="font-bold text-stone-700">Ato II: Conflito</h5>
-                                        <p class="text-sm text-stone-600">Obstáculos, Clímax Intermediário</p>
-                                    </div>
-                                    <div class="text-2xl font-bold text-stone-400 transform md:rotate-0 rotate-90">&rarr;</div>
-                                    <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-300 text-center w-full md:w-auto">
-                                        <h5 class="font-bold text-stone-700">Ato III: Resolução</h5>
-                                        <p class="text-sm text-stone-600">Clímax Final, Desfecho</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CONTEÚDO: Fase 2 -->
-                <section class="content-panel hidden" id="content-fase2">
-                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 2: A Escrita do Primeiro Rascunho</h2>
-                        <p class="text-lg text-stone-600 mb-6">
-                            Esta é a fase de pura criação. A regra de ouro aqui é: <strong class="text-stone-900">Escreva, Não Edite.</strong> O objetivo é terminar.
-                        </p>
-
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Estabeleça uma Rotina de Escrita</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Metas Diárias:</strong> Defina uma meta de palavras ou tempo (ex: 500 palavras ou 1 hora). A consistência é mais importante que a intensidade.</li>
-                                    <li><strong class="text-stone-700">Encontre seu Lugar:</strong> Escolha um local e um horário dedicados para escrever.</li>
-                                    <li><strong class="text-stone-700">Desligue o Crítico Interno:</strong> Permita-se escrever mal. O primeiro rascunho é onde você conta a história para si mesmo.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Siga o Fluxo</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Ignore Buracos na Trama:</strong> Se travar, deixe uma nota (ex: `[RESOLVER DEPOIS]`) e siga em frente.</li>
-                                    <li><strong class="text-stone-700">Mantenha o Ritmo:</strong> Tente escrever cada capítulo do início ao fim sem voltar para polir frases.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CONTEÚDO: Fase 3 -->
-                <section class="content-panel hidden" id="content-fase3">
-                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 3: Revisão, Edição e Polimento</h2>
-                        <p class="text-lg text-stone-600 mb-6">
-                            Parabéns! Você tem o primeiro rascunho. Agora, o trabalho de verdade começa.
-                        </p>
-
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. O Distanciamento (A Fase de Repouso)</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Afaste-se:</strong> Coloque o manuscrito de lado por duas a quatro semanas. Isso permite que você volte ao texto com olhos frescos.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Revisão Estrutural (A Grande Revisão)</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Leia Como um Leitor:</strong> Concentre-se nas questões macro. O ritmo funciona? A motivação é clara? O final é satisfatório?</li>
-                                    <li><strong class="text-stone-700">Grandes Cortes/Reescritas:</strong> Seja implacável. É comum ter que cortar capítulos inteiros ou reorganizar seções.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. Edição de Linha e Copidesque</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Clareza e Voz:</strong> Concentre-se nas frases. As palavras escolhidas transmitem o significado exato?</li>
-                                    <li><strong class="text-stone-700">Gramática e Ortografia:</strong> Corrija erros gramaticais, de pontuação e ortográficos.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">4. Beta Readers e Revisores Profissionais</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li><strong class="text-stone-700">Beta Readers:</strong> Peça a leitores de confiança para identificarem falhas que você não consegue ver.</li>
-                                    <li><strong class="text-stone-700">Revisor Profissional:</strong> Se o objetivo for publicar, o investimento em um profissional é crucial.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CONTEÚDO: Fase 4 -->
-                <section class="content-panel hidden" id="content-fase4">
-                    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-3xl font-bold text-stone-800 mb-4">FASE 4: Finalização</h2>
-                        <p class="text-lg text-stone-600 mb-6">
-                            Você está quase lá! Esta fase prepara seu manuscrito polido para o mundo.
-                        </p>
-
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">1. Título Final</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li>Garanta que o título seja atraente e represente o conteúdo.</li>
-                                </ul>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">2. Sinopse / Texto de Contracapa</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li>Escreva um resumo conciso e instigante que será usado para a divulgação.</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="text-xl font-semibold text-stone-700 mb-2">3. O Caminho da Publicação</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-2 text-stone-600">
-                                    <li>Decida se você buscará uma editora (Publicação Tradicional) ou se publicará por conta própria (Publicação Independente).</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab(event, 'Guias')">📚 Guias e Fases</button>
+            <button class="tab-button" onclick="openTab(event, 'ChecklistCapitulos')">📝 Checklist de Capítulos</button>
+            <button class="tab-button" onclick="openTab(event, 'FichaPersonagens')">🎭 Ficha de Personagens</button>
         </div>
+
+        <div id="Guias" class="tab-content" style="display: block;">
+            <h2>Visão Geral das Fases</h2>
+            <p>Este é o conteúdo principal do seu guia. **(Insira o conteúdo do seu site original aqui)**</p>
+        </div>
+
+        <div id="ChecklistCapitulos" class="tab-content">
+            <h2>📝 Acompanhamento de Capítulos</h2>
+            <p>Use esta seção para acompanhar o progresso de cada capítulo da sua obra. Marque o que já está completo. **O progresso é salvo automaticamente.**</p>
+            
+            <div id="capitulos-list">
+                </div>
+            
+            <button onclick="adicionarCapitulo()">+ Adicionar Novo Capítulo</button>
+        </div>
+
+        <div id="FichaPersonagens" class="tab-content">
+            <h2>🎭 Fichas de Personagens</h2>
+            <p>Crie e organize as fichas detalhadas para seus personagens principais. **O conteúdo é salvo automaticamente.**</p>
+            
+            <div id="personagens-list">
+                </div>
+
+            <button onclick="adicionarPersonagem()">+ Adicionar Novo Personagem</button>
+        </div>
+
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // Lógica de Navegação por Abas
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contentPanels = document.querySelectorAll('.content-panel');
+        // --- VARIÁVEIS GLOBAIS ---
+        let capitulos = [];
+        let personagens = [];
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    const targetId = link.getAttribute('data-target');
+        // --- FUNÇÕES DE PERSISTÊNCIA (SALVAR/CARREGAR) ---
 
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    link.classList.add('active');
+        function salvarDados() {
+            localStorage.setItem('guiaLivros_capitulos', JSON.stringify(capitulos));
+            localStorage.setItem('guiaLivros_personagens', JSON.stringify(personagens));
+            console.log('Dados Salvos!');
+        }
 
-                    contentPanels.forEach(panel => {
-                        if (panel.id === targetId) {
-                            panel.classList.remove('hidden');
-                        } else {
-                            panel.classList.add('hidden');
-                        }
-                    });
-                });
+        function carregarDados() {
+            // Carregar Capítulos
+            const dadosCapitulos = localStorage.getItem('guiaLivros_capitulos');
+            if (dadosCapitulos) {
+                capitulos = JSON.parse(dadosCapitulos);
+                renderizarCapitulos();
+            } else {
+                // Se não houver dados, adicione um exemplo inicial
+                capitulos = [
+                    { id: Date.now(), titulo: 'Capítulo 1: O Despertar', etapas: { escrito: false, revisado: false } }
+                ];
+                renderizarCapitulos();
+            }
+
+            // Carregar Personagens
+            const dadosPersonagens = localStorage.getItem('guiaLivros_personagens');
+            if (dadosPersonagens) {
+                personagens = JSON.parse(dadosPersonagens);
+                renderizarPersonagens();
+            } else {
+                personagens = [
+                    { id: Date.now() + 1, nome: 'Ariane', motivacao: 'Buscar a verdade.', arco: 'De cética a líder.' }
+                ];
+                renderizarPersonagens();
+            }
+        }
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO E MANIPULAÇÃO DE CAPÍTULOS ---
+
+        function renderizarCapitulos() {
+            const list = document.getElementById('capitulos-list');
+            list.innerHTML = ''; // Limpa a lista antes de renderizar
+
+            capitulos.forEach(cap => {
+                const novoCap = document.createElement('div');
+                novoCap.className = 'checklist-item';
+                novoCap.id = `cap-${cap.id}`;
+                
+                novoCap.innerHTML = `
+                    <h3>${cap.titulo} <button class="remove-btn" onclick="removerItem(${cap.id}, 'capitulos')">X</button></h3>
+                    
+                    <input type="checkbox" id="cap-${cap.id}-escrito" ${cap.etapas.escrito ? 'checked' : ''} onchange="atualizarCapitulo(${cap.id}, 'escrito', this.checked)">
+                    <label for="cap-${cap.id}-escrito">Rascunho Escrito</label><br>
+                    
+                    <input type="checkbox" id="cap-${cap.id}-revisado" ${cap.etapas.revisado ? 'checked' : ''} onchange="atualizarCapitulo(${cap.id}, 'revisado', this.checked)">
+                    <label for="cap-${cap.id}-revisado">Revisão Concluída</label>
+                `;
+                list.appendChild(novoCap);
             });
+        }
 
-            // Lógica do Gráfico (Chart.js)
-            const ctx = document.getElementById('phaseFocusChart').getContext('2d');
-            
-            const data = {
-                labels: ['Esforço Analítico', 'Tempo Gasto', 'Criatividade Pura', 'Disciplina'],
-                datasets: [
-                    {
-                        label: 'Fase 1: Planejamento',
-                        data: [8, 4, 9, 6],
-                        fill: true,
-                        backgroundColor: 'rgba(87, 83, 78, 0.2)',
-                        borderColor: 'rgb(87, 83, 78)',
-                        pointBackgroundColor: 'rgb(87, 83, 78)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(87, 83, 78)'
-                    },
-                    {
-                        label: 'Fase 2: 1º Rascunho',
-                        data: [3, 9, 10, 8],
-                        fill: true,
-                        backgroundColor: 'rgba(168, 162, 158, 0.2)',
-                        borderColor: 'rgb(168, 162, 158)',
-                        pointBackgroundColor: 'rgb(168, 162, 158)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(168, 162, 158)'
-                    },
-                    {
-                        label: 'Fase 3: Revisão',
-                        data: [10, 7, 5, 9],
-                        fill: true,
-                        backgroundColor: 'rgba(214, 211, 209, 0.2)',
-                        borderColor: 'rgb(214, 211, 209)',
-                        pointBackgroundColor: 'rgb(214, 211, 209)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(214, 211, 209)'
-                    }
-                ]
+        function adicionarCapitulo() {
+            const numCap = capitulos.length + 1;
+            const novoCap = { 
+                id: Date.now(), 
+                titulo: `Capítulo ${numCap}: Novo Título`, 
+                etapas: { escrito: false, revisado: false } 
             };
+            capitulos.push(novoCap);
+            renderizarCapitulos();
+            salvarDados();
+        }
 
-            const config = {
-                type: 'radar',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    elements: {
-                        line: {
-                            borderWidth: 3
-                        }
-                    },
-                    scales: {
-                        r: {
-                            angleLines: {
-                                color: '#d6d3d1'
-                            },
-                            grid: {
-                                color: '#d6d3d1'
-                            },
-                            pointLabels: {
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                },
-                                color: '#57534e'
-                            },
-                            ticks: {
-                                backdropColor: '#f5f5f4',
-                                color: '#78716c',
-                                stepSize: 2
-                            },
-                            min: 0,
-                            max: 10
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(tooltipItems) {
-                                    const item = tooltipItems[0];
-                                    let label = item.chart.data.labels[item.dataIndex];
-                                    if (Array.isArray(label)) {
-                                      return label.join(' ');
-                                    } else {
-                                      return label;
-                                    }
-                                }
-                            }
-                        },
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#57534e',
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        }
-                    }
+        function atualizarCapitulo(id, etapa, valor) {
+            const capIndex = capitulos.findIndex(c => c.id === id);
+            if (capIndex !== -1) {
+                capitulos[capIndex].etapas[etapa] = valor;
+                salvarDados();
+            }
+        }
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO E MANIPULAÇÃO DE PERSONAGENS ---
+
+        function renderizarPersonagens() {
+            const list = document.getElementById('personagens-list');
+            list.innerHTML = ''; // Limpa a lista antes de renderizar
+
+            personagens.forEach(pers => {
+                const novoPers = document.createElement('div');
+                novoPers.className = 'personagem-ficha';
+                novoPers.id = `pers-${pers.id}`;
+                
+                novoPers.innerHTML = `
+                    <h3>${pers.nome || 'Novo Personagem'} <button class="remove-btn" onclick="removerItem(${pers.id}, 'personagens')">X</button></h3>
+                    
+                    <label for="nome-${pers.id}">Nome Completo:</label>
+                    <input type="text" id="nome-${pers.id}" value="${pers.nome || ''}" onchange="atualizarPersonagem(${pers.id}, 'nome', this.value)">
+
+                    <label for="motivacao-${pers.id}">Motivação Principal:</label>
+                    <input type="text" id="motivacao-${pers.id}" value="${pers.motivacao || ''}" onchange="atualizarPersonagem(${pers.id}, 'motivacao', this.value)">
+
+                    <label for="arco-${pers.id}">Arco de Mudança (De/Para):</label>
+                    <textarea id="arco-${pers.id}" rows="3" onchange="atualizarPersonagem(${pers.id}, 'arco', this.value)">${pers.arco || ''}</textarea>
+                `;
+                list.appendChild(novoPers);
+            });
+        }
+
+        function adicionarPersonagem() {
+            const novoPers = { 
+                id: Date.now(), 
+                nome: `Novo Personagem ${personagens.length + 1}`, 
+                motivacao: '', 
+                arco: '' 
+            };
+            personagens.push(novoPers);
+            renderizarPersonagens();
+            salvarDados();
+        }
+
+        function atualizarPersonagem(id, campo, valor) {
+            const persIndex = personagens.findIndex(p => p.id === id);
+            if (persIndex !== -1) {
+                personagens[persIndex][campo] = valor;
+                // Atualiza o título na tela (caso o campo 'nome' mude)
+                if (campo === 'nome') {
+                    document.querySelector(`#pers-${id} h3`).innerHTML = `${valor} <button class="remove-btn" onclick="removerItem(${id}, 'personagens')">X</button>`;
                 }
-            };
+                salvarDados();
+            }
+        }
 
-            new Chart(ctx, config);
+        // --- FUNÇÃO DE REMOÇÃO GERAL ---
+
+        function removerItem(id, tipo) {
+            if (!confirm("Tem certeza que deseja remover este item?")) {
+                return;
+            }
+            if (tipo === 'capitulos') {
+                capitulos = capitulos.filter(c => c.id !== id);
+                renderizarCapitulos();
+            } else if (tipo === 'personagens') {
+                personagens = personagens.filter(p => p.id !== id);
+                renderizarPersonagens();
+            }
+            salvarDados();
+        }
+
+        // --- LÓGICA DE ABAS (Mantida do Exemplo Anterior) ---
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Garante que a primeira aba de "Guias" esteja ativa ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstButton = document.querySelector('.tab-button');
+            if (firstButton) {
+                openTab({ currentTarget: firstButton }, 'Guias');
+            }
         });
+
     </script>
 </body>
 </html>
